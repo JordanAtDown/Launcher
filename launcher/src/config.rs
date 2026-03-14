@@ -136,6 +136,40 @@ pub struct TimerResolutionConfig {
 fn default_resolution() -> f32 { 0.5 }
 
 #[derive(Deserialize)]
+pub struct PipelineConfig {
+    #[serde(default = "default_game_pipeline")]
+    pub game: Vec<String>,
+    #[serde(default = "default_desktop_pipeline")]
+    pub desktop: Vec<String>,
+}
+
+fn default_game_pipeline() -> Vec<String> {
+    vec![
+        "cec::power_on", "cec::set_source", "display::set_game", "sound::set_game",
+        "wsl::shutdown", "hags::enable", "timerresolution::apply", "gamebar::uninstall",
+        "gamemode::enable", "updates::pause", "notifications::disable", "powerplan::apply",
+        "killist::apply", "disable_services::disable", "rtss::apply",
+        "afterburner::launch", "startup::launch", "steam::launch", "cec::launch_daemon",
+    ].into_iter().map(String::from).collect()
+}
+
+fn default_desktop_pipeline() -> Vec<String> {
+    vec![
+        "display::set_desktop", "disable_services::restore", "sound::set_desktop",
+        "hags::disable", "powerplan::apply", "afterburner::launch", "startup::launch",
+    ].into_iter().map(String::from).collect()
+}
+
+impl Default for PipelineConfig {
+    fn default() -> Self {
+        PipelineConfig {
+            game: default_game_pipeline(),
+            desktop: default_desktop_pipeline(),
+        }
+    }
+}
+
+#[derive(Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub monitor: MonitorConfig,
@@ -173,6 +207,8 @@ pub struct Config {
     pub logging: LoggingConfig,
     #[serde(default)]
     pub cec: CecConfig,
+    #[serde(default)]
+    pub pipeline: PipelineConfig,
 }
 
 impl Default for Config {
@@ -199,6 +235,7 @@ impl Default for Config {
             startup: StartupConfig::default(),
             logging: LoggingConfig::default(),
             cec: CecConfig::default(),
+            pipeline: PipelineConfig::default(),
         }
     }
 }

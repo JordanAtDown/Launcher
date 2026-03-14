@@ -79,6 +79,43 @@ enabled = false
 # daemon = false   # true = lance cec-daemon.exe (veille/réveil TV automatique)
 # log_path = 'C:\Users\jorda\Desktop\cec-daemon.log'  # défaut: cec-daemon.log à côté de l'exe
 
+# [pipeline]
+# Ordre et sélection des modules par mode.
+# Si absent, l'ordre par défaut est utilisé (comportement identique à avant).
+# Retirer un nom = désactiver ce module. Réordonner = changer l'ordre d'exécution.
+#
+# game = [
+#   "cec::power_on",
+#   "cec::set_source",
+#   "display::set_game",
+#   "sound::set_game",
+#   "wsl::shutdown",
+#   "hags::enable",
+#   "timerresolution::apply",
+#   "gamebar::uninstall",
+#   "gamemode::enable",
+#   "updates::pause",
+#   "notifications::disable",
+#   "powerplan::apply",
+#   "killist::apply",
+#   "disable_services::disable",
+#   "rtss::apply",
+#   "afterburner::launch",
+#   "startup::launch",
+#   "steam::launch",
+#   "cec::launch_daemon",
+# ]
+#
+# desktop = [
+#   "display::set_desktop",
+#   "disable_services::restore",
+#   "sound::set_desktop",
+#   "hags::disable",
+#   "powerplan::apply",
+#   "afterburner::launch",
+#   "startup::launch",
+# ]
+
 [timerresolution]
 path = "C:\\tools\\TimerResolution.exe"
 resolution = 0.5         # ms en mode jeu (restauré automatiquement à 15.625ms à la fermeture)
