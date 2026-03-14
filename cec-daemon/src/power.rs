@@ -10,9 +10,10 @@ use windows_sys::core::GUID;
 use windows_sys::Win32::Foundation::{HWND, LPARAM, LRESULT, WPARAM};
 use windows_sys::Win32::System::Power::RegisterPowerSettingNotification;
 use windows_sys::Win32::UI::WindowsAndMessaging::{
-    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, PostQuitMessage,
-    RegisterClassExW, CW_USEDEFAULT, DEVICE_NOTIFY_WINDOW_HANDLE, MSG, PBT_POWERSETTINGCHANGE,
-    WM_DESTROY, WM_POWERBROADCAST, WNDCLASSEXW, WS_OVERLAPPEDWINDOW,
+    CreateWindowExW, DefWindowProcW, DispatchMessageW, GetMessageW, KillTimer, PostQuitMessage,
+    RegisterClassExW, SetTimer, CW_USEDEFAULT, DEVICE_NOTIFY_WINDOW_HANDLE, MSG,
+    PBT_POWERSETTINGCHANGE, WM_DESTROY, WM_POWERBROADCAST, WM_TIMER, WNDCLASSEXW,
+    WS_OVERLAPPEDWINDOW,
 };
 
 // ─── GUID_CONSOLE_DISPLAY_STATE ────────────────────────────────────────────────
@@ -38,6 +39,7 @@ pub const DISPLAY_STATE_GUID: GUID = GUID {
 
 const DISPLAY_OFF: u32 = 0;
 const DISPLAY_ON: u32 = 1;
+const TIMER_ACTIVE_SOURCE: usize = 1;
 
 // ─── Helpers internes ──────────────────────────────────────────────────────────
 
@@ -95,18 +97,22 @@ pub unsafe extern "system" fn wnd_proc(
                         send_cec("standby 0");
                     }
                     DISPLAY_ON => {
-                        log::info!("cec-daemon: display ON → on + active source");
+                        log::info!("cec-daemon: display ON → on (active source dans 200ms)");
                         send_cec("on 0");
-                        // Délai pour laisser la TV s'allumer avant de lui envoyer
-                        // la commande Active Source — certains modèles l'ignorent
-                        // si elle arrive trop tôt.
-                        std::thread::sleep(std::time::Duration::from_millis(200));
-                        send_cec("as");
+                        // Délai non-bloquant : SetTimer déclenche WM_TIMER après 200ms,
+                        // ce qui permet à la boucle de messages de continuer à tourner.
+                        // Certains modèles TV ignorent la commande Active Source si elle
+                        // arrive trop tôt après l'allumage.
+                        SetTimer(hwnd, TIMER_ACTIVE_SOURCE, 200, None);
                     }
                     _ => {} // Valeur 2 = Dimmed, ignorée
                 }
             }
         }
+    } else if msg == WM_TIMER && wparam == TIMER_ACTIVE_SOURCE {
+        KillTimer(hwnd, TIMER_ACTIVE_SOURCE);
+        log::info!("cec-daemon: timer → active source");
+        send_cec("as");
     } else if msg == WM_DESTROY {
         PostQuitMessage(0);
     }
