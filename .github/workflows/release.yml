@@ -33,7 +33,8 @@ jobs:
             target/x86_64-pc-windows-gnu/release/launcher.exe \
             target/x86_64-pc-windows-gnu/release/cec-daemon.exe \
             config.toml \
-            install.ps1
+            install.ps1 \
+            uninstall.ps1
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
