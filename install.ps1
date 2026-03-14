@@ -45,11 +45,15 @@ if (-not (Test-Path $configDst)) {
     Write-Host "  [INFO] config.toml conserve (mise a jour)"
 }
 
-# Met à jour la clé de démarrage Windows avec le nouveau nom versionné
+# Tâche planifiée : logon, utilisateur courant, privilèges élevés (no UAC prompt au démarrage)
 $installedLauncher = Join-Path $InstallDir $launcherSrc.Name
-$regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-Set-ItemProperty -Path $regPath -Name "Launcher" -Value "`"$installedLauncher`""
-Write-Host "  [OK] Demarrage Windows -> $($launcherSrc.Name)"
+schtasks /delete /tn "Launcher" /f 2>&1 | Out-Null
+schtasks /create /tn "Launcher" /tr "`"$installedLauncher`"" /sc ONLOGON /rl HIGHEST /f 2>&1 | Out-Null
+if ($LASTEXITCODE -ne 0) {
+    Write-Warning "  [WARN] Echec creation tache planifiee (code $LASTEXITCODE)"
+} else {
+    Write-Host "  [OK] Tache planifiee : Launcher (logon, privileges eleves)"
+}
 
 Write-Host ""
 Write-Host "Installation terminee : $InstallDir"

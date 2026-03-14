@@ -1,24 +1,22 @@
 $ErrorActionPreference = "Stop"
-$regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run"
-$regName = "Launcher"
+$taskName = "Launcher"
 
 Write-Host "=== Launcher Uninstaller ==="
 
-# Récupère le chemin d'installation depuis la clé registre
-$regValue = (Get-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue).$regName
-if (-not $regValue) {
-    Write-Host "Launcher n'est pas installe (cle registre introuvable)."
+# Récupère le chemin d'installation depuis la tâche planifiée
+$task = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
+if (-not $task) {
+    Write-Host "Launcher n'est pas installe (tache '$taskName' introuvable)."
     exit 0
 }
 
-# La valeur registre est de la forme "C:\...\launcher-0.2.0.exe" (avec guillemets)
-$launcherExe = $regValue.Trim('"')
+$launcherExe = $task.Actions[0].Execute.Trim('"')
 $InstallDir  = Split-Path -Parent $launcherExe
 
 Write-Host "Dossier detecte : $InstallDir"
 Write-Host ""
 
-# Supprime tous les exes versionnés (launcher-*.exe et cec-daemon-*.exe)
+# Supprime tous les exes versionnés
 Get-ChildItem -Path $InstallDir -Filter "launcher-*.exe"   -ErrorAction SilentlyContinue | ForEach-Object {
     Remove-Item $_.FullName -Force
     Write-Host "  [OK] Supprime $($_.Name)"
@@ -28,7 +26,7 @@ Get-ChildItem -Path $InstallDir -Filter "cec-daemon-*.exe" -ErrorAction Silently
     Write-Host "  [OK] Supprime $($_.Name)"
 }
 
-# Supprime config.toml seulement si le dossier ne contient plus que lui
+# Supprime config.toml seulement si c'est le dernier fichier restant
 $remaining = @(Get-ChildItem -Path $InstallDir -ErrorAction SilentlyContinue)
 if ($remaining.Count -eq 1 -and $remaining[0].Name -eq "config.toml") {
     Remove-Item (Join-Path $InstallDir "config.toml") -Force
@@ -43,9 +41,9 @@ if (-not (Get-ChildItem -Path $InstallDir -ErrorAction SilentlyContinue)) {
     Write-Host "  [OK] Supprime le dossier $InstallDir"
 }
 
-# Supprime la clé de registre
-Remove-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
-Write-Host "  [OK] Cle registre demarrage supprimee"
+# Supprime la tâche planifiée
+schtasks /delete /tn $taskName /f 2>&1 | Out-Null
+Write-Host "  [OK] Tache planifiee '$taskName' supprimee"
 
 Write-Host ""
 Write-Host "Desinstallation terminee."
