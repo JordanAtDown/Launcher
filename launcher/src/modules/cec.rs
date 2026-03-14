@@ -36,3 +36,32 @@ pub fn set_source(cfg: &CecConfig) -> bool {
     if !cfg.enabled { return true; }
     run_cmd(cfg, "as")
 }
+
+/// Lance cec-daemon.exe (veille/réveil TV sur extinction écran et arrêt PC).
+/// Le daemon est cherché dans le même répertoire que le launcher.
+pub fn launch_daemon(cfg: &CecConfig) -> bool {
+    if !cfg.enabled || !cfg.daemon { return true; }
+    let client_path = match cfg.client_path.as_deref() {
+        Some(p) => p,
+        None => {
+            log::warn!("cec: client_path non configuré, impossible de lancer cec-daemon");
+            return false;
+        }
+    };
+    let daemon_path = std::env::current_exe()
+        .ok()
+        .and_then(|p| p.parent().map(|d| d.join("cec-daemon.exe")))
+        .unwrap_or_else(|| std::path::PathBuf::from("cec-daemon.exe"));
+    if !daemon_path.exists() {
+        log::warn!("cec: cec-daemon.exe introuvable: {}", daemon_path.display());
+        return false;
+    }
+    match Command::new(&daemon_path)
+        .args(["--path", client_path])
+        .creation_flags(0x08000000)
+        .spawn()
+    {
+        Ok(child) => { log::info!("cec-daemon spawned pid={}", child.id()); true }
+        Err(e)    => { log::warn!("cec-daemon spawn error: {}", e); false }
+    }
+}

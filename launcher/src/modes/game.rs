@@ -29,4 +29,5 @@ pub fn run(config: &Config) {
     log_step("afterburner::launch",    modules::afterburner::launch(&config.afterburner, config.afterburner.game_profile));
     log_step("startup::launch",        modules::startup::launch_game(&config.startup));
     log_step("steam::launch",          modules::steam::launch(&config.steam));
+    log_step("cec::launch_daemon",     modules::cec::launch_daemon(&config.cec));
 }

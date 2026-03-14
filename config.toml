@@ -76,6 +76,7 @@ game = []
 [cec]
 enabled = false
 # client_path = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
+# daemon = false   # true = lance cec-daemon.exe (veille/réveil TV automatique)
 
 [timerresolution]
 path = "C:\\tools\\TimerResolution.exe"

@@ -121,6 +121,8 @@ pub struct CecConfig {
     #[serde(default)]
     pub enabled: bool,                  // activer le contrôle CEC de la TV
     pub client_path: Option<String>,    // chemin vers cec-client.exe (Pulse-Eight)
+    #[serde(default)]
+    pub daemon: bool,                   // lancer cec-daemon.exe en fin de mode jeu
 }
 
 #[derive(Deserialize, Default)]
