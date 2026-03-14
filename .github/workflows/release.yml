@@ -21,7 +21,7 @@ jobs:
           targets: x86_64-pc-windows-gnu
 
       - name: Install mingw-w64
-        run: sudo apt-get install -y gcc-mingw-w64-x86-64
+        run: sudo apt-get install -y gcc-mingw-w64-x86-64 binutils-mingw-w64-x86-64
 
       - name: Build
         run: cargo build --release
@@ -32,7 +32,8 @@ jobs:
           zip launcher-${VERSION}.zip \
             target/x86_64-pc-windows-gnu/release/launcher.exe \
             target/x86_64-pc-windows-gnu/release/cec-daemon.exe \
-            config.toml
+            config.toml \
+            install.ps1
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
