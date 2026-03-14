@@ -1,0 +1,40 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Rust + Windows target
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-gnu
+
+      - name: Install mingw-w64
+        run: sudo apt-get install -y gcc-mingw-w64-x86-64
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Package zip
+        run: |
+          VERSION=${{ github.ref_name }}
+          zip launcher-${VERSION}.zip \
+            target/x86_64-pc-windows-gnu/release/launcher.exe \
+            config.toml
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: launcher-${{ github.ref_name }}.zip
+          generate_release_notes: true

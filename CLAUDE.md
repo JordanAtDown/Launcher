@@ -101,3 +101,29 @@ source ~/.cargo/env
 cargo build --release
 # binaire : target/x86_64-pc-windows-gnu/release/launcher.exe
 ```
+
+---
+
+## Release (GitHub Actions)
+
+Le workflow `.github/workflows/release.yml` se déclenche sur un tag `v*.*.*` et produit automatiquement un zip `launcher-vX.Y.Z.zip` (contient `launcher.exe` + `config.toml`) publié en release GitHub.
+
+### Processus de release
+
+```bash
+# 1. Bumper version dans Cargo.toml  →  version = "0.2.0"
+git add Cargo.toml Cargo.lock
+git commit -m "chore: bump version to 0.2.0"
+git push
+
+# 2. Tagger et pousser
+git tag v0.2.0
+git push origin v0.2.0
+# → GitHub Actions build + publie la release automatiquement (~2-3 min)
+```
+
+### Ce que fait le workflow
+
+1. `ubuntu-latest` + `mingw-w64` → cross-compile `launcher.exe`
+2. `zip launcher-vX.Y.Z.zip launcher.exe config.toml`
+3. `softprops/action-gh-release` → publie la release avec changelog auto

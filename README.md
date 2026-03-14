@@ -338,3 +338,52 @@ cd /mnt/d/developpement.code/launcher
 source ~/.cargo/env
 cargo build --release
 ```
+
+---
+
+## Publier une release
+
+Le projet utilise GitHub Actions pour builder et publier automatiquement une release quand un tag est poussé.
+
+### Processus complet
+
+**1. Modifier le code** puis commiter :
+```bash
+git add .
+git commit -m "feat: description de la modification"
+git push
+```
+
+**2. Bumper la version** dans `Cargo.toml` :
+```toml
+[package]
+version = "0.2.0"   # ← incrémenter ici
+```
+
+**3. Commiter la nouvelle version :**
+```bash
+git add Cargo.toml Cargo.lock
+git commit -m "chore: bump version to 0.2.0"
+git push
+```
+
+**4. Créer et pousser le tag :**
+```bash
+git tag v0.2.0
+git push origin v0.2.0
+```
+
+GitHub Actions se déclenche automatiquement et :
+- Build `launcher.exe` via cross-compilation Windows (ubuntu + mingw-w64)
+- Package `launcher.exe` + `config.toml` dans `launcher-v0.2.0.zip`
+- Publie la release sur GitHub avec le changelog automatique
+
+### Suivre le build
+
+Onglet **Actions** du dépôt GitHub → workflow **Release** → vérifier que le job passe en vert (~2-3 min).
+
+### Télécharger la release
+
+Onglet **Releases** → dernière release → télécharger `launcher-vX.Y.Z.zip`.
+
+> Le zip contient `launcher.exe` et `config.toml`. Extraire les deux dans le même dossier.
