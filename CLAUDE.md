@@ -94,6 +94,20 @@ pub fn apply(...) -> bool {
 3. Ajouter un variant au dispatch dans `main.rs`
 4. Documenter le mode dans `config.toml` et `README.md`
 
+## Workflow de développement
+
+**Règle absolue : chaque fonctionnalité, correction de bug ou refactoring fait l'objet d'un commit + push dédié.** Ne jamais grouper plusieurs changements non liés dans un seul commit.
+
+```bash
+git add <fichiers modifiés>
+git commit -m "feat: ..."   # ou fix: / refactor: / docs: / chore:
+git push
+```
+
+Cela permet de borner chaque modification, de faciliter les revert et de garder un historique lisible.
+
+---
+
 ## Build (depuis WSL Ubuntu)
 
 ```bash
