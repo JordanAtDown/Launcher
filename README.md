@@ -13,7 +13,7 @@ Monorepo contenant deux binaires Windows pour une station de jeu TV :
 
 ```
 Windows démarre
-  → launcher.exe (Run key)
+  → launcher.exe (tâche planifiée, logon, privilèges élevés)
       → mode bureau : restaure les services, plan eco, résolution 2560×1440 …
       → mode jeu    : optimise tout, lance Steam Big Picture + cec-daemon.exe
                             ↓
@@ -54,48 +54,55 @@ cargo build --release
 
 ## Installation
 
-**1. Activer le hook pre-commit (une seule fois après un clone frais) :**
-```bash
-git config core.hooksPath .githooks
-```
+### Télécharger la release
 
-**2. Copier `config.toml` dans le même dossier que les `.exe` :**
+Récupérer le zip `launcher-vX.Y.Z.zip` depuis la page [Releases](../../releases), extraire dans un dossier temporaire.
+
+### Lancer le script d'installation
+
+Le script nécessite des droits administrateur (création de tâche planifiée) et PowerShell doit être autorisé à exécuter des scripts.
+
+**Méthode recommandée — PowerShell admin, bypass de politique :**
 ```powershell
-$dir = "D:\tools\launcher"
-Copy-Item "D:\developpement.code\launcher\config.toml" $dir
-Copy-Item "target\x86_64-pc-windows-gnu\release\launcher.exe" $dir
-Copy-Item "target\x86_64-pc-windows-gnu\release\cec-daemon.exe" $dir
+# Ouvrir PowerShell en administrateur, se placer dans le dossier extrait
+cd "C:\chemin\vers\launcher-vX.Y.Z"
+PowerShell -ExecutionPolicy Bypass -File install.ps1
 ```
 
-**3. Ajouter `launcher.exe` au démarrage Windows :**
+> **Pourquoi `-ExecutionPolicy Bypass` ?**
+> Windows bloque par défaut l'exécution de scripts `.ps1` non signés.
+> Ce flag s'applique uniquement à la session courante, sans modifier la politique globale.
+
+Le script :
+- copie `launcher-X.Y.Z.exe` et `cec-daemon-X.Y.Z.exe` dans `%LOCALAPPDATA%\Programs\Launcher`
+- copie `config.toml` uniquement à la **première installation** (préservé lors des mises à jour)
+- crée une **tâche planifiée** `Launcher` qui s'exécute au logon avec privilèges élevés (sans prompt UAC)
+
+### Désinstaller
+
 ```powershell
-$exe = "D:\tools\launcher\launcher.exe"
-Set-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" `
-    -Name "WinSetupLauncher" -Value $exe
+PowerShell -ExecutionPolicy Bypass -File uninstall.ps1
 ```
 
-**4. Supprimer du démarrage :**
+### Vérifier la tâche planifiée
+
 ```powershell
-Remove-ItemProperty "HKCU:\Software\Microsoft\Windows\CurrentVersion\Run" `
-    -Name "WinSetupLauncher"
+Get-ScheduledTask -TaskName "Launcher" | Select-Object TaskName, State
+(Get-ScheduledTask -TaskName "Launcher").Actions | Select-Object Execute
 ```
 
-> La release GitHub inclut `launcher.exe`, `cec-daemon.exe` et `config.toml` dans un zip prêt à l'emploi.
+> La release GitHub inclut `launcher-X.Y.Z.exe`, `cec-daemon-X.Y.Z.exe`, `config.toml`, `install.ps1` et `uninstall.ps1` dans un zip prêt à l'emploi.
 
 ---
 
 ## Release
 
 ```bash
-# 1. Bumper la version dans launcher/Cargo.toml (et cec-daemon/Cargo.toml si besoin)
-git add launcher/Cargo.toml
-git commit -m "chore: bump version to 0.2.0"
-git push
-
-# 2. Tagger → GitHub Actions build + publie automatiquement
-git tag v0.2.0
-git push origin v0.2.0
+# Depuis WSL, à la racine du repo
+bash scripts/release.sh 0.3.1
 ```
+
+Le script bumpe la version, commit, tag et push. GitHub Actions prend le relais.
 
 GitHub Actions cross-compile depuis Ubuntu + mingw-w64, package les deux binaires + `config.toml`
 dans `launcher-vX.Y.Z.zip` et publie la release (~2-3 min).
