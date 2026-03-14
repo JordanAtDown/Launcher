@@ -98,14 +98,29 @@ La mise à l'échelle se définit en `%` — la conversion vers la valeur intern
 
 Redirige le périphérique audio principal selon le mode via `svcl.exe` (SoundVolumeCommandLine de NirSoft). Avec `auto_detect = true`, vérifie que le device est visible avant de switcher — si la TV est éteinte, le switch est ignoré proprement.
 
-Pour trouver le bon nom : ouvrir `SoundVolumeView.exe` en GUI, colonne **Name**.
-
 | Paramètre | Description |
 |-----------|-------------|
-| `exe_path` | Chemin vers `svcl.exe` ou `SoundVolumeView.exe` |
+| `exe_path` | Chemin vers `svcl.exe` |
 | `game_device` | Sous-chaîne du nom du device en mode jeu (ex: `"LG"`) |
 | `desktop_device` | Sous-chaîne du nom du device en mode bureau (ex: `"Speakers"`) |
 | `auto_detect` | `true` = vérifie que le device est disponible avant de switcher |
+
+> **Téléchargement :** [NirSoft SoundVolumeCommandLine](https://www.nirsoft.net/utils/sound_volume_command_line.html) — contient `svcl.exe` (CLI) et `SoundVolumeView.exe` (GUI).
+
+**Trouver le nom d'un device — méthode GUI :**
+1. Lancer `SoundVolumeView.exe`
+2. Repérer le device dans la liste, colonne **Name**
+3. Copier un fragment distinctif (ex : `"LG"`, `"Realtek"`, `"Speakers"`)
+
+**Trouver le nom d'un device — méthode ligne de commande :**
+```cmd
+svcl.exe /scomma ""
+```
+Liste tous les périphériques audio actifs. La **première colonne** est le nom exact du device.
+
+> `game_device` / `desktop_device` sont des **sous-chaînes** (insensible à la casse) — un fragment unique suffit, pas besoin du nom complet.
+>
+> `auto_detect = true` : au démarrage, `svcl` vérifie que le device est visible avant de tenter le switch — si la TV est éteinte, le switch est ignoré sans erreur.
 
 ---
 

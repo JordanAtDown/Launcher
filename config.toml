@@ -52,7 +52,7 @@ game_limit = 0           # images/sec en mode jeu (0 = illimité)
 exe_path       = "C:\\tools\\QRes.exe"    # requis pour le changement de résolution (QRes.exe)
 game_width     = 1920
 game_height    = 1080
-game_scale     = 175    # mise à l'échelle mode jeu en % — valeurs valides : 100, 125, 150, 175, 200
+game_scale     = 200    # mise à l'échelle mode jeu en % — valeurs valides : 100, 125, 150, 175, 200
                         # (100%=96 | 125%=120 | 150%=144 | 175%=168 | 200%=192 — conversion interne)
 desktop_width  = 2560
 desktop_height = 1440
@@ -60,9 +60,9 @@ desktop_scale  = 125    # mise à l'échelle mode bureau en %
 refresh_rate   = 60     # Hz (0 = ne pas changer)
 
 [sound]
-exe_path        = "C:\\tools\\svcl.exe"   # svcl.exe (SoundVolumeCommandLine) ou SoundVolumeView.exe
+exe_path        = "C:\\Program Files\\Tools\\SoundVolumeView.exe"   # svcl.exe (SoundVolumeCommandLine) ou SoundVolumeView.exe
 game_device     = "LG"                    # sous-chaîne du nom du device TV/HDMI (insensible à la casse)
-desktop_device  = "Speakers"              # sous-chaîne du nom des enceintes bureau
+desktop_device  = "PA278CV"              # sous-chaîne du nom des ecran ASUS
 auto_detect     = true                    # vérifie que le device est visible avant de switcher
 
 [wsl]
