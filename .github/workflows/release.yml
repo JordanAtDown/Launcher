@@ -31,6 +31,7 @@ jobs:
           VERSION=${{ github.ref_name }}
           zip launcher-${VERSION}.zip \
             target/x86_64-pc-windows-gnu/release/launcher.exe \
+            target/x86_64-pc-windows-gnu/release/cec-daemon.exe \
             config.toml
 
       - name: Create GitHub Release
