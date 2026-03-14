@@ -106,6 +106,16 @@ git push
 
 Cela permet de borner chaque modification, de faciliter les revert et de garder un historique lisible.
 
+### Hook pre-commit (build automatique)
+
+Le script `.githooks/pre-commit` lance `cargo build --release` avant chaque commit et annule le commit si le build échoue.
+
+**Activer après un clone frais (une seule fois) :**
+
+```bash
+git config core.hooksPath .githooks
+```
+
 ---
 
 ## Build (depuis WSL Ubuntu)

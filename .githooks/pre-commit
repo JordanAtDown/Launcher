@@ -1,0 +1,15 @@
+#!/bin/sh
+# Lance cargo build --release (cross-compile Windows depuis WSL) avant chaque commit.
+# Si le build échoue, le commit est annulé.
+
+echo "[pre-commit] cargo build --release..."
+
+wsl bash -lc "cd /mnt/d/developpement.code/launcher && cargo build --release 2>&1"
+
+if [ $? -ne 0 ]; then
+    echo ""
+    echo "[pre-commit] BUILD ÉCHOUÉ — commit annulé."
+    exit 1
+fi
+
+echo "[pre-commit] build ok."
