@@ -3,7 +3,7 @@
 # Fonctionne depuis Windows (Git Bash / CMD) et depuis WSL directement.
 # Si le build échoue, le commit est annulé.
 
-echo "[pre-commit] cargo build --release..."
+echo "[pre-commit] cargo build --release (launcher + cec-daemon)..."
 
 if command -v wsl > /dev/null 2>&1; then
     # Appelé depuis Windows : utiliser WSL
