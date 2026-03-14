@@ -1,4 +1,5 @@
 pub mod afterburner;
+pub mod cec;
 pub mod disable_services;
 pub mod display;
 pub mod gamebar;

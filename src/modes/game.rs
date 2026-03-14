@@ -11,6 +11,8 @@ fn log_step(step: &str, ok: bool) {
 }
 
 pub fn run(config: &Config) {
+    log_step("cec::power_on",          modules::cec::power_on(&config.cec));
+    log_step("cec::set_source",        modules::cec::set_source(&config.cec));
     log_step("display::set_game",      modules::display::set_game(&config.display));
     log_step("sound::set_game",        modules::sound::set_game(&config.sound));
     log_step("wsl::shutdown",          modules::wsl::shutdown(&config.wsl));

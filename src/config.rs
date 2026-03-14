@@ -117,6 +117,13 @@ pub struct WslConfig {
 }
 
 #[derive(Deserialize, Default)]
+pub struct CecConfig {
+    #[serde(default)]
+    pub enabled: bool,                  // activer le contrôle CEC de la TV
+    pub client_path: Option<String>,    // chemin vers cec-client.exe (Pulse-Eight)
+}
+
+#[derive(Deserialize, Default)]
 pub struct TimerResolutionConfig {
     pub path: Option<String>,              // chemin vers TimerResolution.exe
     #[serde(default = "default_resolution")]
@@ -161,6 +168,8 @@ pub struct Config {
     pub startup: StartupConfig,
     #[serde(default)]
     pub logging: LoggingConfig,
+    #[serde(default)]
+    pub cec: CecConfig,
 }
 
 impl Default for Config {
@@ -186,6 +195,7 @@ impl Default for Config {
             timerresolution: TimerResolutionConfig::default(),
             startup: StartupConfig::default(),
             logging: LoggingConfig::default(),
+            cec: CecConfig::default(),
         }
     }
 }

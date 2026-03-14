@@ -73,6 +73,10 @@ enabled = true            # true = arrêter WSL en mode jeu (libère CPU/RAM + V
 desktop = ["C:\\Program Files\\Synology\\SynologyDrive\\bin\\launcher.exe"]
 game = []
 
+[cec]
+enabled = false
+# client_path = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
+
 [timerresolution]
 path = "C:\\tools\\TimerResolution.exe"
 resolution = 0.5         # ms en mode jeu (restauré automatiquement à 15.625ms à la fermeture)

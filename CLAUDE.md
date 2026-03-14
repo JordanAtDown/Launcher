@@ -10,10 +10,11 @@ src/
   config.rs            ← structs de configuration (une sous-struct par module)
   modes/
     mod.rs
-    game.rs            ← mode jeu : lance afterburner + steam
+    game.rs            ← mode jeu : CEC TV → display → sound → … → afterburner → steam
     desktop.rs         ← mode bureau : no-op (extensible)
   modules/
     mod.rs
+    cec.rs             ← allume la TV + bascule source HDMI via cec-client (Pulse-Eight)
     steam.rs           ← lance Steam avec les arguments configurés
     afterburner.rs     ← lance MSI Afterburner avec le profil configuré
 ```

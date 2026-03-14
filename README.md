@@ -265,6 +265,52 @@ desktop = [
 ]
 ```
 
+### `[cec]` — Contrôle TV HDMI CEC (Pulse-Eight)
+
+Allume la TV et bascule sur l'entrée HDMI du PC au démarrage du mode jeu, via l'adaptateur USB-CEC [Pulse-Eight](https://www.pulse-eight.com/p/104/usb-hdmi-cec-adapter) et son outil `cec-client.exe`.
+
+| Paramètre | Défaut | Description |
+|-----------|--------|-------------|
+| `enabled` | `false` | `true` = active le contrôle CEC au démarrage du mode jeu |
+| `client_path` | *(absent = désactivé)* | Chemin vers `cec-client.exe` (fourni par le driver Pulse-Eight) |
+
+> La source HDMI est auto-détectée : `cec-client` diffuse l'adresse physique de l'adaptateur via le bus CEC, la TV switch automatiquement sur le bon port — aucune configuration de source nécessaire.
+
+#### Prérequis
+
+1. Adaptateur USB-CEC Pulse-Eight branché entre le PC (HDMI) et la TV (HDMI), + câble USB vers le PC
+2. Driver Pulse-Eight installé → fournit `cec-client.exe` dans `C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\`
+
+#### Tester en PowerShell avant d'activer
+
+```powershell
+$cec = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
+
+# Allumer la TV
+& $cec -s -c "on 0"
+
+# Basculer la TV sur l'entrée HDMI du PC (Active Source)
+& $cec -s -c "as"
+
+# Mettre la TV en veille (optionnel, non utilisé par le launcher)
+& $cec -s -c "standby 0"
+
+# Lister les appareils CEC détectés sur le bus
+& $cec -l
+```
+
+> Si `cec-client.exe` n'est pas dans ce chemin, chercher avec : `Get-ChildItem 'C:\Program Files*' -Recurse -Filter 'cec-client.exe' -ErrorAction SilentlyContinue`
+
+#### Configuration
+
+```toml
+[cec]
+enabled = true
+client_path = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
+```
+
+---
+
 ### `[afterburner]` — MSI Afterburner
 Lance MSI Afterburner avec un profil d'overclocking différent selon le mode.
 
