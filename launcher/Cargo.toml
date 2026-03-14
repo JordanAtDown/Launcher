@@ -2,6 +2,7 @@
 name = "launcher"
 version = "0.1.0"
 edition = "2021"
+description = "Game/Desktop Mode Launcher"
 
 [dependencies]
 toml = "0.8"
@@ -9,4 +10,7 @@ serde = { version = "1", features = ["derive"] }
 winreg = "0.52"
 log = "0.4"
 simplelog = "0.12"
+
+[build-dependencies]
+winres = "0.1"
 
