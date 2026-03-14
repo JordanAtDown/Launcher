@@ -47,7 +47,9 @@ if (-not (Test-Path $configDst)) {
 
 # Tâche planifiée : logon, utilisateur courant, privilèges élevés (no UAC prompt au démarrage)
 $installedLauncher = Join-Path $InstallDir $launcherSrc.Name
+$ErrorActionPreference = "SilentlyContinue"
 schtasks /delete /tn "Launcher" /f 2>&1 | Out-Null
+$ErrorActionPreference = "Stop"
 schtasks /create /tn "Launcher" /tr "`"$installedLauncher`"" /sc ONLOGON /rl HIGHEST /f 2>&1 | Out-Null
 if ($LASTEXITCODE -ne 0) {
     Write-Warning "  [WARN] Echec creation tache planifiee (code $LASTEXITCODE)"
