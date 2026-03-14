@@ -1,0 +1,78 @@
+[logging]
+# path = "C:\\Users\\jorda\\Desktop\\launcher.log"  # défaut: launcher.log à côté de l'exe
+
+[monitor]
+name = "LG"            # sous-chaîne du nom du moniteur (insensible à la casse)
+mode = "auto"          # "auto" = détection | "game" = force jeu | "desktop" = force bureau
+
+[steam]
+path = "C:\\Program Files (x86)\\Steam\\steam.exe"
+args = ["-bigpicture"]
+
+[afterburner]             # supprimer cette section pour désactiver
+path = "C:\\Program Files (x86)\\MSI Afterburner\\MSIAfterburner.exe"
+game_profile = 1          # profil chargé en mode jeu (1 à 5)
+desktop_profile = 3       # profil chargé en mode bureau (1 à 5, optionnel)
+
+[gamemode]
+enabled = true            # activer le Game Mode Windows en mode jeu
+
+[gamebar]
+uninstall = true          # désinstaller Xbox Gaming Overlay + désactiver Game DVR
+
+[updates]
+pause_in_game = true      # stopper le service Windows Update en mode jeu
+
+[notifications]
+disable_in_game = true    # désactiver les notifications toast en mode jeu
+
+[powerplan]
+# GUID du plan jeu    (powercfg /L pour lister les GUIDs)
+# GUID du plan bureau (laisser vide = ne rien changer)
+game = "a9d668f2-d7d6-43f1-845e-ff29a2846b00"                 # Gaming
+desktop = "381b4222-f694-41f0-9685-ff5bb260df2e"              # Eco
+
+[killist]
+# Services à désactiver en mode jeu et restaurer (Manuel) en mode bureau.
+# Trouver le nom court : services.msc → double-clic → onglet Général → champ "Nom du service"
+services = ["WSearch", "WTabletServicePro", "SysMain", "Spooler", "XblGameSave", "Synology Drive VSS Service x64"]
+processes = []            # ex: ["SynologyDrive.exe", "OneDrive.exe"]
+
+[disable_services]
+# Services à désactiver en mode jeu et restaurer (Manuel) en mode bureau.
+# Trouver le nom court : services.msc → double-clic → onglet Général → champ "Nom du service"
+services = []
+
+[rtss]
+path = "C:\\Program Files (x86)\\RivaTuner Statistics Server\\RTSS.exe"
+profile_path = "C:\\Program Files (x86)\\RivaTuner Statistics Server\\Profiles\\Global"
+game_limit = 0           # images/sec en mode jeu (0 = illimité)
+
+[display]
+exe_path       = "C:\\tools\\QRes.exe"    # requis pour le changement de résolution (QRes.exe)
+game_width     = 1920
+game_height    = 1080
+game_scale     = 175    # mise à l'échelle mode jeu en % — valeurs valides : 100, 125, 150, 175, 200
+                        # (100%=96 | 125%=120 | 150%=144 | 175%=168 | 200%=192 — conversion interne)
+desktop_width  = 2560
+desktop_height = 1440
+desktop_scale  = 125    # mise à l'échelle mode bureau en %
+refresh_rate   = 60     # Hz (0 = ne pas changer)
+
+[sound]
+exe_path        = "C:\\tools\\svcl.exe"   # svcl.exe (SoundVolumeCommandLine) ou SoundVolumeView.exe
+game_device     = "LG"                    # sous-chaîne du nom du device TV/HDMI (insensible à la casse)
+desktop_device  = "Speakers"              # sous-chaîne du nom des enceintes bureau
+auto_detect     = true                    # vérifie que le device est visible avant de switcher
+
+[wsl]
+enabled = true            # true = arrêter WSL en mode jeu (libère CPU/RAM + VM Hyper-V légère)
+
+[startup]
+# Exécutables à lancer automatiquement selon le mode (chemins complets)
+desktop = ["C:\\Program Files\\Synology\\SynologyDrive\\bin\\launcher.exe"]
+game = []
+
+[timerresolution]
+path = "C:\\tools\\TimerResolution.exe"
+resolution = 0.5         # ms en mode jeu (restauré automatiquement à 15.625ms à la fermeture)

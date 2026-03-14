@@ -1,0 +1,15 @@
+[package]
+name = "launcher"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+toml = "0.8"
+serde = { version = "1", features = ["derive"] }
+winreg = "0.52"
+log = "0.4"
+simplelog = "0.12"
+
+[profile.release]
+opt-level = "z"
+strip = true

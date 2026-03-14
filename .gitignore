@@ -1,0 +1,21 @@
+# Rust build artifacts
+/target/
+
+# Cargo lock (keep for binaries)
+# Cargo.lock  ← intentionally tracked
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+Thumbs.db
+.DS_Store
+
+# Claude Code local settings
+.claude/
+
+# Secrets / local config overrides
+# config.toml is tracked (no secrets expected)

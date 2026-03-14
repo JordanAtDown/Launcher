@@ -1,0 +1,17 @@
+pub mod afterburner;
+pub mod disable_services;
+pub mod display;
+pub mod gamebar;
+pub mod hags;
+pub mod gamemode;
+pub mod killist;
+pub mod monitor;
+pub mod notifications;
+pub mod powerplan;
+pub mod rtss;
+pub mod sound;
+pub mod startup;
+pub mod steam;
+pub mod timerresolution;
+pub mod updates;
+pub mod wsl;
