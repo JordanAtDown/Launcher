@@ -2,6 +2,7 @@
 name = "cec-daemon"
 version = "0.1.0"
 edition = "2021"
+description = "HDMI CEC TV Control Daemon"
 
 [dependencies]
 windows-sys = { version = "0.48", features = [
@@ -13,3 +14,6 @@ windows-sys = { version = "0.48", features = [
 ] }
 log = "0.4"
 simplelog = "0.12"
+
+[build-dependencies]
+winres = "0.1"
