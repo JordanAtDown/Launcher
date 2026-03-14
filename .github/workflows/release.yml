@@ -29,9 +29,12 @@ jobs:
       - name: Package zip
         run: |
           VERSION=${{ github.ref_name }}
+          VER=${VERSION#v}
+          cp target/x86_64-pc-windows-gnu/release/launcher.exe   launcher-${VER}.exe
+          cp target/x86_64-pc-windows-gnu/release/cec-daemon.exe cec-daemon-${VER}.exe
           zip launcher-${VERSION}.zip \
-            target/x86_64-pc-windows-gnu/release/launcher.exe \
-            target/x86_64-pc-windows-gnu/release/cec-daemon.exe \
+            launcher-${VER}.exe \
+            cec-daemon-${VER}.exe \
             config.toml \
             install.ps1 \
             uninstall.ps1

@@ -11,21 +11,21 @@ if (-not $regValue) {
     exit 0
 }
 
-# La valeur registre est de la forme "C:\...\launcher.exe" (avec guillemets)
+# La valeur registre est de la forme "C:\...\launcher-0.2.0.exe" (avec guillemets)
 $launcherExe = $regValue.Trim('"')
 $InstallDir  = Split-Path -Parent $launcherExe
 
 Write-Host "Dossier detecte : $InstallDir"
 Write-Host ""
 
-# Supprime les fichiers (config.toml conserve si l'utilisateur l'a modifie)
-$binaries = @("launcher.exe", "cec-daemon.exe")
-foreach ($f in $binaries) {
-    $target = Join-Path $InstallDir $f
-    if (Test-Path $target) {
-        Remove-Item $target -Force
-        Write-Host "  [OK] Supprime $f"
-    }
+# Supprime tous les exes versionnés (launcher-*.exe et cec-daemon-*.exe)
+Get-ChildItem -Path $InstallDir -Filter "launcher-*.exe"   -ErrorAction SilentlyContinue | ForEach-Object {
+    Remove-Item $_.FullName -Force
+    Write-Host "  [OK] Supprime $($_.Name)"
+}
+Get-ChildItem -Path $InstallDir -Filter "cec-daemon-*.exe" -ErrorAction SilentlyContinue | ForEach-Object {
+    Remove-Item $_.FullName -Force
+    Write-Host "  [OK] Supprime $($_.Name)"
 }
 
 # Supprime config.toml seulement si le dossier ne contient plus que lui
@@ -43,7 +43,7 @@ if (-not (Get-ChildItem -Path $InstallDir -ErrorAction SilentlyContinue)) {
     Write-Host "  [OK] Supprime le dossier $InstallDir"
 }
 
-# Supprime la cle de registre
+# Supprime la clé de registre
 Remove-ItemProperty -Path $regPath -Name $regName -ErrorAction SilentlyContinue
 Write-Host "  [OK] Cle registre demarrage supprimee"
 
