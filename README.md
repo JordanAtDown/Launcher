@@ -1,6 +1,8 @@
 # Steam Big Picture Launcher
 
-Au démarrage Windows, lance Steam en mode Big Picture (et optionnellement MSI Afterburner avec un profil). Tout le comportement est configurable via `config.toml`.
+Monorepo contenant deux binaires Windows :
+- **`launcher.exe`** — orchestrateur de démarrage : lance les bons programmes selon le mode (jeu / bureau), configurable via `config.toml`
+- **`cec-daemon.exe`** — daemon autonome : met la TV en veille/réveil via HDMI CEC sur extinction d'écran et arrêt PC (couvre Modern Standby S0 + S3 + shutdown)
 
 ## Comportement au démarrage
 
@@ -91,9 +93,10 @@ source ~/.cargo/env
 cargo build --release
 ```
 
-Le binaire est généré dans :
+Les binaires sont générés dans :
 ```
 target/x86_64-pc-windows-gnu/release/launcher.exe
+target/x86_64-pc-windows-gnu/release/cec-daemon.exe
 ```
 
 ---
@@ -273,6 +276,7 @@ Allume la TV et bascule sur l'entrée HDMI du PC au démarrage du mode jeu, via 
 |-----------|--------|-------------|
 | `enabled` | `false` | `true` = active le contrôle CEC au démarrage du mode jeu |
 | `client_path` | *(absent = désactivé)* | Chemin vers `cec-client.exe` (fourni par le driver Pulse-Eight) |
+| `daemon` | `false` | `true` = lance `cec-daemon.exe` en fin de mode jeu (veille/réveil automatique) |
 
 > La source HDMI est auto-détectée : `cec-client` diffuse l'adresse physique de l'adaptateur via le bus CEC, la TV switch automatiquement sur le bon port — aucune configuration de source nécessaire.
 
@@ -292,7 +296,7 @@ $cec = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
 # Basculer la TV sur l'entrée HDMI du PC (Active Source)
 & $cec -s -c "as"
 
-# Mettre la TV en veille (optionnel, non utilisé par le launcher)
+# Mettre la TV en veille
 & $cec -s -c "standby 0"
 
 # Lister les appareils CEC détectés sur le bus
@@ -307,6 +311,25 @@ $cec = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
 [cec]
 enabled = true
 client_path = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
+daemon = true   # lance cec-daemon.exe pour la veille/réveil automatique
+```
+
+#### `cec-daemon.exe` — veille et réveil automatiques
+
+`cec-daemon.exe` est un daemon autonome lancé en fin de mode jeu. Il garde une connexion CEC ouverte et réagit à :
+
+| Événement | Action TV |
+|-----------|-----------|
+| Extinction d'écran (veille S3, Modern Standby S0, inactivité 30 min) | Standby TV |
+| Rallumage d'écran (réveil souris/clavier) | TV allumée + source HDMI active |
+| Arrêt PC (shutdown) | Standby TV |
+
+**Pourquoi `GUID_CONSOLE_DISPLAY_STATE` et non `PBT_APMSUSPEND` :**
+Modern Standby (S0) est le mode veille par défaut depuis Windows 10 — `PBT_APMSUSPEND` n'est pas déclenché. `GUID_CONSOLE_DISPLAY_STATE` se déclenche pour tous les types de veille car l'écran s'éteint toujours.
+
+Le daemon est à côté de `launcher.exe` dans la release zip. Il se lance avec :
+```
+cec-daemon.exe --path "C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe"
 ```
 
 ---
@@ -400,7 +423,7 @@ git commit -m "feat: description de la modification"
 git push
 ```
 
-**2. Bumper la version** dans `Cargo.toml` :
+**2. Bumper la version** dans `launcher/Cargo.toml` (et `cec-daemon/Cargo.toml` si besoin) :
 ```toml
 [package]
 version = "0.2.0"   # ← incrémenter ici
@@ -408,7 +431,7 @@ version = "0.2.0"   # ← incrémenter ici
 
 **3. Commiter la nouvelle version :**
 ```bash
-git add Cargo.toml Cargo.lock
+git add launcher/Cargo.toml
 git commit -m "chore: bump version to 0.2.0"
 git push
 ```
@@ -420,8 +443,8 @@ git push origin v0.2.0
 ```
 
 GitHub Actions se déclenche automatiquement et :
-- Build `launcher.exe` via cross-compilation Windows (ubuntu + mingw-w64)
-- Package `launcher.exe` + `config.toml` dans `launcher-v0.2.0.zip`
+- Build `launcher.exe` + `cec-daemon.exe` via cross-compilation Windows (ubuntu + mingw-w64)
+- Package `launcher.exe` + `cec-daemon.exe` + `config.toml` dans `launcher-v0.2.0.zip`
 - Publie la release sur GitHub avec le changelog automatique
 
 ### Suivre le build
@@ -432,4 +455,4 @@ Onglet **Actions** du dépôt GitHub → workflow **Release** → vérifier que 
 
 Onglet **Releases** → dernière release → télécharger `launcher-vX.Y.Z.zip`.
 
-> Le zip contient `launcher.exe` et `config.toml`. Extraire les deux dans le même dossier.
+> Le zip contient `launcher.exe`, `cec-daemon.exe` et `config.toml`. Extraire les trois dans le même dossier.

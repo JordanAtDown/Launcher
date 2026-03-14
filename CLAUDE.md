@@ -1,25 +1,58 @@
 # Architecture du projet
 
-Ce projet est un **orchestrateur de démarrage Windows** qui lance les bons programmes selon le mode configuré.
+Ce projet est un **monorepo Cargo workspace** contenant deux binaires Windows :
 
-## Structure
+| Binaire | Rôle |
+|---------|------|
+| `launcher.exe` | Orchestrateur de démarrage : lance les bons programmes selon le mode (jeu / bureau) |
+| `cec-daemon.exe` | Daemon autonome : veille/réveil de la TV HDMI CEC sur extinction écran et arrêt PC |
+
+## Structure workspace
 
 ```
-src/
-  main.rs              ← orchestrateur : charge la config, dispatche vers le mode actif
-  config.rs            ← structs de configuration (une sous-struct par module)
-  modes/
-    mod.rs
-    game.rs            ← mode jeu : CEC TV → display → sound → … → afterburner → steam
-    desktop.rs         ← mode bureau : no-op (extensible)
-  modules/
-    mod.rs
-    cec.rs             ← allume la TV + bascule source HDMI via cec-client (Pulse-Eight)
-    steam.rs           ← lance Steam avec les arguments configurés
-    afterburner.rs     ← lance MSI Afterburner avec le profil configuré
+Cargo.toml                   ← [workspace] members = ["launcher", "cec-daemon"]
+config.toml                  ← configuration unique partagée
+.github/workflows/release.yml
+.githooks/pre-commit
+launcher/
+  Cargo.toml
+  src/
+    main.rs              ← orchestrateur : charge la config, dispatche vers le mode actif
+    config.rs            ← structs de configuration (une sous-struct par module)
+    modes/
+      mod.rs
+      game.rs            ← mode jeu : CEC TV → display → sound → … → afterburner → steam → daemon
+      desktop.rs         ← mode bureau : no-op (extensible)
+    modules/
+      mod.rs
+      cec.rs             ← allume TV + source HDMI + lance cec-daemon (Pulse-Eight)
+      steam.rs           ← lance Steam
+      afterburner.rs     ← lance MSI Afterburner
+      ...
+cec-daemon/
+  Cargo.toml
+  src/main.rs            ← daemon Windows : écoute extinctions écran + arrêt PC → CEC standby/wake
 ```
 
-## Types de modules
+## cec-daemon — fonctionnement
+
+`cec-daemon.exe --path <cec-client.exe>` :
+- Spawn `cec-client.exe -s` avec stdin pipe (connexion CEC ouverte, réponse <100ms)
+- `SetConsoleCtrlHandler` : `CTRL_SHUTDOWN_EVENT` → `standby 0`
+- Fenêtre cachée + `RegisterPowerSettingNotification(GUID_CONSOLE_DISPLAY_STATE)` :
+  - Écran OFF (valeur 0) → `standby 0`  ← couvre S3 + Modern Standby S0 + inactivité
+  - Écran ON  (valeur 1) → `on 0` + `as`  ← allume TV + bascule source HDMI au réveil
+
+**Pourquoi `GUID_CONSOLE_DISPLAY_STATE` et non `PBT_APMSUSPEND` :**
+Modern Standby (S0) est le mode veille par défaut depuis Windows 10 — le CPU reste actif
+à très basse consommation (comme un smartphone). `PBT_APMSUSPEND` n'est pas déclenché en S0.
+`GUID_CONSOLE_DISPLAY_STATE` se déclenche pour tous les types de veille car l'écran s'éteint
+toujours, quelle que soit la méthode.
+
+**Pourquoi stdin-pipe et non libcec-sys :**
+libcec-sys utilise des `.lib` MSVC incompatibles avec la toolchain MinGW-w64 (cross-compilation WSL).
+
+## Types de modules (launcher)
 
 ### Module registre
 Écrit une ou plusieurs valeurs dans le registre Windows. Retourne `bool` directement depuis `set_value().is_ok()`. Pas de vérification de chemin, pas de PID.
@@ -81,17 +114,17 @@ pub fn apply(...) -> bool {
 
 ## Ajouter un nouveau module
 
-1. Créer `src/modules/foo.rs` avec une fonction `pub fn launch(cfg: &FooConfig)`
-2. Ajouter `pub mod foo;` dans `src/modules/mod.rs`
-3. Ajouter `FooConfig` dans `config.rs` et un champ `pub foo: FooConfig` dans `Config`
+1. Créer `launcher/src/modules/foo.rs` avec une fonction `pub fn launch(cfg: &FooConfig)`
+2. Ajouter `pub mod foo;` dans `launcher/src/modules/mod.rs`
+3. Ajouter `FooConfig` dans `launcher/src/config.rs` et un champ `pub foo: FooConfig` dans `Config`
 4. Ajouter la section `[foo]` dans `config.toml`
 5. Appeler `modules::foo::launch(&config.foo)` depuis le(s) mode(s) concerné(s)
 
 ## Ajouter un nouveau mode
 
-1. Créer `src/modes/bar.rs` avec une fonction `pub fn run(config: &Config)`
-2. Ajouter `pub mod bar;` dans `src/modes/mod.rs`
-3. Ajouter un variant au dispatch dans `main.rs`
+1. Créer `launcher/src/modes/bar.rs` avec une fonction `pub fn run(config: &Config)`
+2. Ajouter `pub mod bar;` dans `launcher/src/modes/mod.rs`
+3. Ajouter un variant au dispatch dans `launcher/src/main.rs`
 4. Documenter le mode dans `config.toml` et `README.md`
 
 ## Workflow de développement
@@ -104,11 +137,9 @@ git commit -m "feat: ..."   # ou fix: / refactor: / docs: / chore:
 git push
 ```
 
-Cela permet de borner chaque modification, de faciliter les revert et de garder un historique lisible.
-
 ### Hook pre-commit (build automatique)
 
-Le script `.githooks/pre-commit` lance `cargo build --release` avant chaque commit et annule le commit si le build échoue.
+Le script `.githooks/pre-commit` lance `cargo build --release` avant chaque commit et annule le commit si le build échoue. Fonctionne depuis Windows (Git Bash) et depuis WSL directement.
 
 **Activer après un clone frais (une seule fois) :**
 
@@ -124,20 +155,22 @@ git config core.hooksPath .githooks
 cd /mnt/d/developpement.code/launcher
 source ~/.cargo/env
 cargo build --release
-# binaire : target/x86_64-pc-windows-gnu/release/launcher.exe
+# binaires :
+#   target/x86_64-pc-windows-gnu/release/launcher.exe
+#   target/x86_64-pc-windows-gnu/release/cec-daemon.exe
 ```
 
 ---
 
 ## Release (GitHub Actions)
 
-Le workflow `.github/workflows/release.yml` se déclenche sur un tag `v*.*.*` et produit automatiquement un zip `launcher-vX.Y.Z.zip` (contient `launcher.exe` + `config.toml`) publié en release GitHub.
+Le workflow `.github/workflows/release.yml` se déclenche sur un tag `v*.*.*` et produit automatiquement un zip `launcher-vX.Y.Z.zip` (contient `launcher.exe` + `cec-daemon.exe` + `config.toml`) publié en release GitHub.
 
 ### Processus de release
 
 ```bash
-# 1. Bumper version dans Cargo.toml  →  version = "0.2.0"
-git add Cargo.toml Cargo.lock
+# 1. Bumper version dans launcher/Cargo.toml (et cec-daemon/Cargo.toml si besoin)
+git add launcher/Cargo.toml
 git commit -m "chore: bump version to 0.2.0"
 git push
 
@@ -149,6 +182,6 @@ git push origin v0.2.0
 
 ### Ce que fait le workflow
 
-1. `ubuntu-latest` + `mingw-w64` → cross-compile `launcher.exe`
-2. `zip launcher-vX.Y.Z.zip launcher.exe config.toml`
+1. `ubuntu-latest` + `mingw-w64` → cross-compile `launcher.exe` + `cec-daemon.exe`
+2. `zip launcher-vX.Y.Z.zip launcher.exe cec-daemon.exe config.toml`
 3. `softprops/action-gh-release` → publie la release avec changelog auto
