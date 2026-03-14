@@ -168,17 +168,33 @@ Le workflow `.github/workflows/release.yml` se déclenche sur un tag `v*.*.*` et
 
 ### Processus de release
 
+**Règle absolue :** toujours commiter les modifications fonctionnelles AVANT de lancer le script de release. L'historique doit toujours avoir un commit de modification suivi d'un commit `chore: bump version`.
+
+**Préfixes de commit conventionnels :**
+
+| Préfixe | Usage |
+|---------|-------|
+| `feat:` | Nouvelle fonctionnalité |
+| `fix:` | Correction de bug |
+| `refactor:` | Refactoring sans changement de comportement |
+| `docs:` | Documentation uniquement |
+| `chore:` | Tâches de maintenance (bump version, CI, hooks…) |
+| `perf:` | Amélioration de performance |
+| `style:` | Formatage, nommage (sans changement logique) |
+| `test:` | Ajout ou correction de tests |
+
 ```bash
-# 1. Bumper version dans launcher/Cargo.toml (et cec-daemon/Cargo.toml si besoin)
-git add launcher/Cargo.toml
-git commit -m "chore: bump version to 0.2.0"
+# 1. Commiter les modifications avec le bon préfixe
+git add <fichiers modifiés>
+git commit -m "fix: ..."   # ou feat: / refactor: / docs: / chore: / etc.
 git push
 
-# 2. Tagger et pousser
-git tag v0.2.0
-git push origin v0.2.0
-# → GitHub Actions build + publie la release automatiquement (~2-3 min)
+# 2. Lancer le script de release
+bash scripts/release.sh 0.3.4
+# → bump version, commit, tag, push → GitHub Actions publie automatiquement (~2-3 min)
 ```
+
+Le script `release.sh` abortera si des changements non commités sont détectés.
 
 ### Ce que fait le workflow
 

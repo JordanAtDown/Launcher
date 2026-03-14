@@ -15,6 +15,18 @@ if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
     exit 1
 fi
 
+# Vérifier que le dépôt est propre (pas de changements non commités)
+if [ -n "$(git status --porcelain)" ]; then
+    echo "Erreur : des changements ne sont pas commités."
+    echo "  Commite tes modifications avant de lancer la release :"
+    echo "    git add <fichiers>"
+    echo "    git commit -m \"fix: ...\""
+    echo "    git push"
+    echo ""
+    git status --short
+    exit 1
+fi
+
 echo "[release] Bump version -> $VERSION"
 sed -i "s/^version = \"[0-9]*\.[0-9]*\.[0-9]*\"/version = \"$VERSION\"/" Cargo.toml
 
