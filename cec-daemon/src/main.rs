@@ -45,15 +45,31 @@ unsafe extern "system" fn ctrl_handler(ctrl_type: u32) -> i32 {
 // ─── Point d'entrée ───────────────────────────────────────────────────────────
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    logging::setup_logging();
-
-    // ── Parse --path <cec-client.exe> ──────────────────────────────────────────
+    // ── Parse les arguments CLI avant d'initialiser le logger ──────────────────
     let args: Vec<String> = std::env::args().collect();
+
+    // --path <cec-client.exe> (obligatoire)
     let cec_path = args
         .windows(2)
         .find(|w| w[0] == "--path")
         .map(|w| w[1].clone())
-        .ok_or("usage: cec-daemon.exe --path <cec-client.exe>")?;
+        .ok_or("usage: cec-daemon.exe --path <cec-client.exe> [--log <log-file>]")?;
+
+    // --log <path> (optionnel — défaut : cec-daemon.log à côté de l'exe)
+    let log_path: std::path::PathBuf = args
+        .windows(2)
+        .find(|w| w[0] == "--log")
+        .map(|w| std::path::PathBuf::from(&w[1]))
+        .unwrap_or_else(|| {
+            std::env::current_exe()
+                .ok()
+                .and_then(|p| p.parent().map(|p| p.to_path_buf()))
+                .unwrap_or_else(|| std::path::PathBuf::from("."))
+                .join("cec-daemon.log")
+        });
+
+    // ── Init logging (maintenant que le chemin est connu) ──────────────────────
+    logging::setup_logging(&log_path);
 
     // ── Spawn cec-client et initialise le global stdin ─────────────────────────
     let client = CecClient::spawn(&cec_path)?;

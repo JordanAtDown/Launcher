@@ -77,6 +77,7 @@ game = []
 enabled = false
 # client_path = 'C:\Program Files (x86)\Pulse-Eight\USB-CEC Adapter\cec-client.exe'
 # daemon = false   # true = lance cec-daemon.exe (veille/réveil TV automatique)
+# log_path = 'C:\Users\jorda\Desktop\cec-daemon.log'  # défaut: cec-daemon.log à côté de l'exe
 
 [timerresolution]
 path = "C:\\tools\\TimerResolution.exe"

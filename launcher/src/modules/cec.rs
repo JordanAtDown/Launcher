@@ -56,11 +56,12 @@ pub fn launch_daemon(cfg: &CecConfig) -> bool {
         log::warn!("cec: cec-daemon.exe introuvable: {}", daemon_path.display());
         return false;
     }
-    match Command::new(&daemon_path)
-        .args(["--path", client_path])
-        .creation_flags(0x08000000)
-        .spawn()
-    {
+    let mut cmd = Command::new(&daemon_path);
+    cmd.args(["--path", client_path]).creation_flags(0x08000000);
+    if let Some(log_path) = cfg.log_path.as_deref() {
+        cmd.args(["--log", log_path]);
+    }
+    match cmd.spawn() {
         Ok(child) => { log::info!("cec-daemon spawned pid={}", child.id()); true }
         Err(e)    => { log::warn!("cec-daemon spawn error: {}", e); false }
     }

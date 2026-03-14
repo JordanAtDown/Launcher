@@ -123,6 +123,7 @@ pub struct CecConfig {
     pub client_path: Option<String>,    // chemin vers cec-client.exe (Pulse-Eight)
     #[serde(default)]
     pub daemon: bool,                   // lancer cec-daemon.exe en fin de mode jeu
+    pub log_path: Option<String>,       // chemin du log de cec-daemon (défaut: cec-daemon.log à côté de l'exe)
 }
 
 #[derive(Deserialize, Default)]
