@@ -1,11 +1,10 @@
 use crate::config::StartupConfig;
-use std::os::windows::process::CommandExt;
 use std::path::Path;
-use std::process::Command;
+use super::spawn_minimized;
 
-/// Lance tous les exécutables de la liste.
+/// Lance tous les exécutables de la liste minimisés.
 /// Retourne `false` si la liste est vide, `true` sinon (les échecs individuels sont loggés en WARN).
-pub fn launch(apps: &[String]) -> bool {
+fn launch(apps: &[String]) -> bool {
     if apps.is_empty() { return false; }
     for path in apps {
         if path.is_empty() { continue; }
@@ -13,12 +12,9 @@ pub fn launch(apps: &[String]) -> bool {
             log::warn!("startup: not found: {}", path);
             continue;
         }
-        match Command::new(path)
-            .creation_flags(0x08000000)
-            .spawn()
-        {
-            Ok(child) => log::info!("startup: spawned {} pid={}", path, child.id()),
-            Err(e)    => log::warn!("startup: spawn error {}: {}", path, e),
+        match spawn_minimized(path, &[]) {
+            Some(pid) => log::info!("startup: spawned {} pid={}", path, pid),
+            None      => log::warn!("startup: spawn error {}", path),
         }
     }
     true

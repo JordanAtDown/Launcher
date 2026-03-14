@@ -5,7 +5,7 @@ mod modes;
 mod modules;
 
 use log::info;
-use simplelog::{Config, LevelFilter, WriteLogger};
+use simplelog::{ConfigBuilder, LevelFilter, WriteLogger};
 use std::fs::OpenOptions;
 use std::path::PathBuf;
 
@@ -26,7 +26,11 @@ fn main() {
         });
 
     if let Ok(file) = OpenOptions::new().create(true).append(true).open(&log_path) {
-        let _ = WriteLogger::init(LevelFilter::Info, Config::default(), file);
+        let log_config = ConfigBuilder::new()
+            .set_time_offset_to_local()
+            .unwrap_or_else(|c| c)
+            .build();
+        let _ = WriteLogger::init(LevelFilter::Info, log_config, file);
     }
 
     let game_mode = modules::monitor::resolve_mode(&config.monitor);

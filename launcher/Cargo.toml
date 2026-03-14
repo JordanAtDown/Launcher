@@ -10,6 +10,7 @@ serde = { version = "1", features = ["derive"] }
 winreg = "0.52"
 log = "0.4"
 simplelog = "0.12"
+time = { version = "0.3", features = ["local-offset"] }
 
 [build-dependencies]
 winres = "0.1"
