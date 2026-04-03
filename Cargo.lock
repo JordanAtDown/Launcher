@@ -4,7 +4,7 @@ version = 4
 
 [[package]]
 name = "cec-daemon"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "log",
  "simplelog",
@@ -57,7 +57,7 @@ checksum = "92ecc6618181def0457392ccd0ee51198e065e016d1d527a7ac1b6dc7c1f09d2"
 
 [[package]]
 name = "launcher"
-version = "0.3.11"
+version = "0.3.12"
 dependencies = [
  "log",
  "serde",

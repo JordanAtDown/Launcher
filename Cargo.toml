@@ -3,7 +3,7 @@ members = ["launcher", "cec-daemon"]
 resolver = "2"
 
 [workspace.package]
-version = "0.3.11"
+version = "0.3.12"
 
 [profile.release]
 opt-level = "z"

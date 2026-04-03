@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.12 — 2026-04-03
+
+### Corrections
+
+- Treat wuauserv exit code 2 as success (service already stopped)
+
+### Nouveautés
+
+- Add updates::restore to restart wuauserv in desktop mode
+
 ## v0.3.11 — 2026-04-03
 
 ### Corrections
