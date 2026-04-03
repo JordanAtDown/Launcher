@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.10 — 2026-04-03
+
+### Corrections
+
+- Use WmiMonitorID EDID names instead of Win32_DesktopMonitor for monitor detection
+
 ## v0.3.9 — 2026-04-03
 
 ### Corrections
