@@ -1,21 +1,17 @@
 #!/bin/sh
-# Lance cargo build --release (cross-compile Windows depuis WSL) avant chaque commit.
-# Fonctionne depuis Windows (Git Bash / CMD) et depuis WSL directement.
+# Lance cargo build --release avant chaque commit.
 # Si le build échoue, le commit est annulé.
 
-echo "[pre-commit] cargo build --release (launcher + cec-daemon)..."
+echo "[pre-commit] cargo build --release..."
 
-if command -v wsl > /dev/null 2>&1; then
-    # Appelé depuis Windows : utiliser WSL
-    wsl bash -lc "cd /mnt/d/developpement.code/launcher && cargo build --release 2>&1"
-else
-    # Appelé depuis WSL directement
-    bash -lc "cd /mnt/d/developpement.code/launcher && source ~/.cargo/env && cargo build --release 2>&1"
-fi
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+. "$HOME/.cargo/env"
+
+cd "$REPO_ROOT" && cargo build --release 2>&1
 
 if [ $? -ne 0 ]; then
     echo ""
-    echo "[pre-commit] BUILD ÉCHOUÉ — commit annulé."
+    echo "[pre-commit] BUILD ECHOUE — commit annule."
     exit 1
 fi
 
