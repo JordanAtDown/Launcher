@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.3.7 — 2026-04-03
+
+### Documentation
+
+- Regenerate CHANGELOG from full git history via git-cliff
+
+### Refactoring
+
+- Replace QRes with NirCmd and remove scale config from display module
+
 ## v0.3.6 — 2026-04-03
 
 ### Corrections
