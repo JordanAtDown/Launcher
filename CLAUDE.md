@@ -164,24 +164,40 @@ cargo build --release
 
 ## Release (GitHub Actions)
 
-Le workflow `.github/workflows/release.yml` se déclenche sur un tag `v*.*.*` et produit automatiquement un zip `launcher-vX.Y.Z.zip` (contient `launcher.exe` + `cec-daemon.exe` + `config.toml`) publié en release GitHub.
+Le workflow `.github/workflows/release.yml` se déclenche sur un tag `v*.*.*` et produit automatiquement un zip `launcher-vX.Y.Z.zip` publié en release GitHub avec un changelog généré depuis les commits conventionnels.
+
+### Changelog conventionnel (git-cliff)
+
+Le projet utilise **[git-cliff](https://git-cliff.org)** pour générer automatiquement le changelog à partir des préfixes de commit.
+
+- **`cliff.toml`** — configuration des groupes et du format
+- **`CHANGELOG.md`** — mis à jour à chaque release par `release.sh` (si git-cliff est installé)
+- **GitHub Release body** — généré par `orhun/git-cliff-action` dans le CI (toujours à jour)
+
+**Installer git-cliff (une seule fois, optionnel en local) :**
+```bash
+cargo install git-cliff
+```
+
+### Préfixes de commit conventionnels
+
+Les préfixes impactent directement le changelog généré :
+
+| Préfixe | Section dans le changelog |
+|---------|--------------------------|
+| `feat:` | Nouveautés |
+| `fix:` | Corrections |
+| `refactor:` | Refactoring |
+| `perf:` | Performance |
+| `docs:` | Documentation |
+| `style:` | Style |
+| `test:` | Tests |
+| `chore:` | Maintenance |
+| `chore: bump version` | *(ignoré dans le changelog)* |
 
 ### Processus de release
 
 **Règle absolue :** toujours commiter les modifications fonctionnelles AVANT de lancer le script de release. L'historique doit toujours avoir un commit de modification suivi d'un commit `chore: bump version`.
-
-**Préfixes de commit conventionnels :**
-
-| Préfixe | Usage |
-|---------|-------|
-| `feat:` | Nouvelle fonctionnalité |
-| `fix:` | Correction de bug |
-| `refactor:` | Refactoring sans changement de comportement |
-| `docs:` | Documentation uniquement |
-| `chore:` | Tâches de maintenance (bump version, CI, hooks…) |
-| `perf:` | Amélioration de performance |
-| `style:` | Formatage, nommage (sans changement logique) |
-| `test:` | Ajout ou correction de tests |
 
 ```bash
 # 1. Commiter les modifications avec le bon préfixe
@@ -190,8 +206,9 @@ git commit -m "fix: ..."   # ou feat: / refactor: / docs: / chore: / etc.
 git push
 
 # 2. Lancer le script de release
-bash scripts/release.sh 0.3.4
-# → bump version, commit, tag, push → GitHub Actions publie automatiquement (~2-3 min)
+bash scripts/release.sh 0.3.5
+# → met à jour CHANGELOG.md, bump version, commit, tag, push
+# → GitHub Actions publie automatiquement (~2-3 min)
 ```
 
 Le script `release.sh` abortera si des changements non commités sont détectés.
@@ -199,5 +216,6 @@ Le script `release.sh` abortera si des changements non commités sont détectés
 ### Ce que fait le workflow
 
 1. `ubuntu-latest` + `mingw-w64` → cross-compile `launcher.exe` + `cec-daemon.exe`
-2. `zip launcher-vX.Y.Z.zip launcher.exe cec-daemon.exe config.toml`
-3. `softprops/action-gh-release` → publie la release avec changelog auto
+2. `orhun/git-cliff-action` → génère les notes de release depuis les commits conventionnels
+3. `zip launcher-vX.Y.Z.zip` → package binaires + `config.toml` + scripts `.ps1` + `.bat`
+4. `softprops/action-gh-release` → publie la release avec le changelog formaté

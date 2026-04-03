@@ -33,8 +33,17 @@ sed -i "s/^version = \"[0-9]*\.[0-9]*\.[0-9]*\"/version = \"$VERSION\"/" Cargo.t
 echo "[release] Validation..."
 cargo check --quiet
 
+echo "[release] Mise a jour du CHANGELOG..."
+if command -v git-cliff &>/dev/null; then
+    git-cliff --tag "v$VERSION" -o CHANGELOG.md
+    git add Cargo.toml Cargo.lock CHANGELOG.md
+else
+    echo "  [WARN] git-cliff non trouve — CHANGELOG.md non mis a jour"
+    echo "  Pour l'installer : cargo install git-cliff"
+    git add Cargo.toml Cargo.lock
+fi
+
 echo "[release] Commit..."
-git add Cargo.toml Cargo.lock
 git commit -m "chore: bump version to $VERSION"
 
 echo "[release] Tag v$VERSION..."

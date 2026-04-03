@@ -37,10 +37,23 @@ jobs:
             cec-daemon-${VER}.exe \
             config.toml \
             install.ps1 \
-            uninstall.ps1
+            uninstall.ps1 \
+            install.bat \
+            uninstall.bat \
+            update.bat
+
+      - name: Generate Changelog
+        uses: orhun/git-cliff-action@v4
+        id: cliff
+        with:
+          config: cliff.toml
+          args: --latest --strip header
+        env:
+          OUTPUT: RELEASE_NOTES.md
+          GITHUB_REPO: ${{ github.repository }}
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: launcher-${{ github.ref_name }}.zip
-          generate_release_notes: true
+          body_path: RELEASE_NOTES.md
