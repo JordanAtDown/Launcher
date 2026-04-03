@@ -49,14 +49,11 @@ profile_path = "C:\\Program Files (x86)\\RivaTuner Statistics Server\\Profiles\\
 game_limit = 0           # images/sec en mode jeu (0 = illimité)
 
 [display]
-exe_path       = "C:\\tools\\QRes.exe"    # requis pour le changement de résolution (QRes.exe)
+exe_path       = "C:\\tools\\nircmd.exe"  # requis pour le changement de résolution (NirCmd)
 game_width     = 1920
 game_height    = 1080
-game_scale     = 200    # mise à l'échelle mode jeu en % — valeurs valides : 100, 125, 150, 175, 200
-                        # (100%=96 | 125%=120 | 150%=144 | 175%=168 | 200%=192 — conversion interne)
 desktop_width  = 2560
 desktop_height = 1440
-desktop_scale  = 125    # mise à l'échelle mode bureau en %
 refresh_rate   = 60     # Hz (0 = ne pas changer)
 
 [sound]

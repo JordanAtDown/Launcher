@@ -79,10 +79,8 @@ pub struct DisplayConfig {
     pub exe_path:       Option<String>, // chemin vers nircmd.exe
     pub game_width:     Option<u32>,    // résolution jeu
     pub game_height:    Option<u32>,
-    pub game_scale:     Option<u32>,    // mise à l'échelle jeu en % (100, 125, 150, 175, 200)
     pub desktop_width:  Option<u32>,    // résolution bureau
     pub desktop_height: Option<u32>,
-    pub desktop_scale:  Option<u32>,    // mise à l'échelle bureau en %
     #[serde(default)]
     pub refresh_rate:   u32,            // Hz (0 = ne pas changer)
 }
