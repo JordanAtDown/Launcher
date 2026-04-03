@@ -15,6 +15,7 @@ pub fn pause(cfg: &UpdatesConfig) -> bool {
         .status()
     {
         Ok(s) if s.success() => true,
+        Ok(s) if s.code() == Some(2) => true, // déjà arrêté — état désiré atteint
         Ok(s)  => { log::warn!("updates: wuauserv exit={:?}", s.code()); false }
         Err(e) => { log::warn!("updates: error: {}", e); false }
     }
