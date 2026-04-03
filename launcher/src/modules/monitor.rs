@@ -14,11 +14,11 @@ pub fn resolve_mode(cfg: &MonitorConfig) -> bool {
 
 fn detect(name: &str) -> bool {
     if name.is_empty() { return false; }
+    // WmiMonitorID lit les noms EDID réels (fabricant + modèle) contrairement à
+    // Win32_DesktopMonitor qui retourne uniquement "Moniteur Plug-and-Play générique"
+    let cmd = r#"Get-WmiObject -Namespace root\wmi -Class WmiMonitorID | ForEach-Object { ($_.UserFriendlyName | Where-Object {$_} | ForEach-Object {[char]$_}) -join '' }"#;
     let output = Command::new("powershell")
-        .args([
-            "-NoProfile", "-NonInteractive", "-Command",
-            "Get-WmiObject Win32_DesktopMonitor | Select-Object -ExpandProperty Name",
-        ])
+        .args(["-NoProfile", "-NonInteractive", "-Command", cmd])
         .output();
     match output {
         Ok(o) => String::from_utf8_lossy(&o.stdout)
