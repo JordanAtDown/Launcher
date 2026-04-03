@@ -33,6 +33,13 @@ if ($cecDaemonSrc) {
     Write-Host "  [OK] $($cecDaemonSrc.Name)"
 }
 
+# update.bat : copie dans le dossier d'installation (toujours à jour)
+$updateBatSrc = Join-Path $scriptDir "update.bat"
+if (Test-Path $updateBatSrc) {
+    Copy-Item $updateBatSrc -Destination $InstallDir -Force
+    Write-Host "  [OK] update.bat"
+}
+
 # config.toml : copie uniquement à la première installation (préservé lors des mises à jour)
 $configDst = Join-Path $InstallDir "config.toml"
 if (-not (Test-Path $configDst)) {

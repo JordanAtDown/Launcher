@@ -54,35 +54,25 @@ cargo build --release
 
 ## Installation
 
-### Télécharger la release
+### Première installation
 
-Récupérer le zip `launcher-vX.Y.Z.zip` depuis la page [Releases](../../releases), extraire dans un dossier temporaire.
+1. Récupérer le zip `launcher-vX.Y.Z.zip` depuis la page [Releases](../../releases) et l'extraire
+2. Double-cliquer sur **`install.bat`** → UAC → installation automatique
 
-### Lancer le script d'installation
+Le script copie les binaires dans `%LOCALAPPDATA%\Programs\Launcher`, copie `config.toml` (première fois uniquement) et `update.bat`, et crée une tâche planifiée au logon avec privilèges élevés.
 
-Le script nécessite des droits administrateur (création de tâche planifiée) et PowerShell doit être autorisé à exécuter des scripts.
+### Mise à jour
 
-**Méthode recommandée — PowerShell admin, bypass de politique :**
-```powershell
-# Ouvrir PowerShell en administrateur, se placer dans le dossier extrait
-cd "C:\chemin\vers\launcher-vX.Y.Z"
-PowerShell -ExecutionPolicy Bypass -File install.ps1
-```
+Double-cliquer sur **`update.bat`** (présent dans le dossier d'installation après la première install) :
+- télécharge automatiquement la dernière release GitHub
+- installe sans intervention manuelle
+- préserve `config.toml`
 
-> **Pourquoi `-ExecutionPolicy Bypass` ?**
-> Windows bloque par défaut l'exécution de scripts `.ps1` non signés.
-> Ce flag s'applique uniquement à la session courante, sans modifier la politique globale.
+Pas besoin de télécharger le zip manuellement.
 
-Le script :
-- copie `launcher-X.Y.Z.exe` et `cec-daemon-X.Y.Z.exe` dans `%LOCALAPPDATA%\Programs\Launcher`
-- copie `config.toml` uniquement à la **première installation** (préservé lors des mises à jour)
-- crée une **tâche planifiée** `Launcher` qui s'exécute au logon avec privilèges élevés (sans prompt UAC)
+### Désinstallation
 
-### Désinstaller
-
-```powershell
-PowerShell -ExecutionPolicy Bypass -File uninstall.ps1
-```
+Double-cliquer sur **`uninstall.bat`** depuis le dossier extrait.
 
 ### Vérifier la tâche planifiée
 
@@ -91,7 +81,7 @@ Get-ScheduledTask -TaskName "Launcher" | Select-Object TaskName, State
 (Get-ScheduledTask -TaskName "Launcher").Actions | Select-Object Execute
 ```
 
-> La release GitHub inclut `launcher-X.Y.Z.exe`, `cec-daemon-X.Y.Z.exe`, `config.toml`, `install.ps1` et `uninstall.ps1` dans un zip prêt à l'emploi.
+> La release GitHub inclut les binaires, `config.toml`, les scripts `.ps1` et les fichiers `.bat` prêts à l'emploi dans un zip.
 
 ---
 
