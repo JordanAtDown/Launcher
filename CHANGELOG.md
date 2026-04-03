@@ -1,49 +1,100 @@
 # Changelog
 
-> Généré automatiquement par [git-cliff](https://git-cliff.org) à partir des commits conventionnels.
-> Mis à jour à chaque release via `bash scripts/release.sh`.
+## v0.3.6 — 2026-04-03
+
+### Corrections
+
+- Remove GITHUB_REPO from git-cliff action to disable PR metadata fetch
+
+### Maintenance
+
+- Simplify pre-commit hook, remove WSL logic, use dynamic repo root
+
+## v0.3.5 — 2026-04-03
+
+### Documentation
+
+- Update sound config and improve sound module documentation
+
+### Maintenance
+
+- Add conventional changelog with git-cliff
+
+### Nouveautés
+
+- Add bat wrappers for turnkey install, update, and uninstall
 
 ## v0.3.4 — 2026-03-14
 
-### Documentation
-- Update sound config and improve sound module documentation
-
-## v0.3.3 — 2026-03-14
-
 ### Corrections
+
 - Launch afterburner and startup apps minimized + use local time in logs
 
 ### Maintenance
+
 - Abort release if worktree has uncommitted changes
 
-## v0.3.2
+## v0.3.2 — 2026-03-14
 
 ### Documentation
+
 - Update README with install script usage and execution policy fix
 
-## v0.3.1
+## v0.3.1 — 2026-03-14
 
 ### Corrections
+
 - Suppress schtasks delete error when task does not exist yet
 
-## v0.3.0
+## v0.3.0 — 2026-03-14
 
 ### Nouveautés
+
 - Configurable module pipeline per mode (order + selection)
 
-## v0.2.1
+## v0.2.1 — 2026-03-14
 
 ### Nouveautés
-- Use Task Scheduler for elevated auto-start
+
 - Embed requireAdministrator UAC manifest in launcher.exe
+- Use Task Scheduler for elevated auto-start
 
-## v0.2.0
+## v0.2.0 — 2026-03-14
+
+### Documentation
+
+- Enforce one commit+push per feature/fix in CLAUDE.md
+- Update for monorepo structure + cec-daemon
+- Split README into root + launcher + cec-daemon
+
+### Maintenance
+
+- Add pre-commit hook — aborts commit if cargo build fails
+- Clarify pre-commit hook builds launcher + cec-daemon
+- Unify version via workspace inheritance
+- Add release automation script
 
 ### Nouveautés
-- Versioned exe names in release zip and install scripts
-- Add uninstall script + include in release zip
 
-## v0.1.0
-
-### Nouveautés
+- Add HDMI CEC module (Pulse-Eight USB-CEC adapter)
+- Implement cec-daemon (standby/wake on all sleep types + shutdown)
+- Launcher spawns cec-daemon in game mode
+- Add --log <path> option for configurable log file
+- Embed Win32 version info metadata for Task Manager
+- Embed Win32 version info metadata for Task Manager
 - Add Windows installation script with startup registration
+- Add uninstall script + include in release zip
+- Versioned exe names in release zip and install scripts
+
+### Performance
+
+- Replace sleep in wnd_proc with SetTimer/WM_TIMER
+
+### Refactoring
+
+- Restructure as Cargo workspace (launcher + cec-daemon)
+- Split cec-daemon into focused modules
+
+## v0.1.0 — 2026-03-14
+
+
