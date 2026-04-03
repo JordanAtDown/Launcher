@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.9 — 2026-04-03
+
+### Corrections
+
+- Use SW_HIDE instead of SW_SHOWMINIMIZED to reliably hide app windows on launch
+
 ## v0.3.8 — 2026-04-03
 
 ### Corrections
