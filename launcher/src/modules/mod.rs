@@ -26,7 +26,7 @@ type WORD    = u16;
 type LPWSTR  = *mut u16;
 
 const STARTF_USESHOWWINDOW: DWORD = 0x0000_0001;
-const SW_SHOWMINIMIZED:     WORD  = 2;
+const SW_HIDE:              WORD  = 0;
 const CREATE_NO_WINDOW:     DWORD = 0x0800_0000;
 
 #[repr(C)]
@@ -75,7 +75,7 @@ extern "system" {
     fn CloseHandle(h: HANDLE) -> BOOL;
 }
 
-/// Spawne un processus GUI en démarrage réduit (minimisé dans la barre des tâches/tray).
+/// Spawne un processus GUI avec la fenêtre masquée (SW_HIDE).
 /// Retourne le PID en cas de succès, None en cas d'erreur.
 pub(super) fn spawn_minimized(path: &str, args: &[&str]) -> Option<u32> {
     let mut cmdline = format!("\"{}\"", path);
@@ -89,7 +89,7 @@ pub(super) fn spawn_minimized(path: &str, args: &[&str]) -> Option<u32> {
     let mut si: STARTUPINFOW = unsafe { std::mem::zeroed() };
     si.cb = std::mem::size_of::<STARTUPINFOW>() as u32;
     si.dw_flags = STARTF_USESHOWWINDOW;
-    si.w_show_window = SW_SHOWMINIMIZED;
+    si.w_show_window = SW_HIDE;
 
     let mut pi: PROCESS_INFORMATION = unsafe { std::mem::zeroed() };
 
