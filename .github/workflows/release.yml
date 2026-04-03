@@ -48,11 +48,9 @@ jobs:
         with:
           config: cliff.toml
           args: --latest --strip header
-        env:
-          OUTPUT: RELEASE_NOTES.md
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: launcher-${{ github.ref_name }}.zip
-          body_path: RELEASE_NOTES.md
+          body: ${{ steps.cliff.outputs.content }}
