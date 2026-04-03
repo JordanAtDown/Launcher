@@ -154,7 +154,7 @@ fn default_game_pipeline() -> Vec<String> {
 fn default_desktop_pipeline() -> Vec<String> {
     vec![
         "display::set_desktop", "disable_services::restore", "sound::set_desktop",
-        "hags::disable", "powerplan::apply", "afterburner::launch", "startup::launch",
+        "hags::disable", "updates::restore", "powerplan::apply", "afterburner::launch", "startup::launch",
     ].into_iter().map(String::from).collect()
 }
 
