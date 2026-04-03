@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.8 — 2026-04-03
+
+### Corrections
+
+- Use cliff step output for release body instead of body_path
+
 ## v0.3.7 — 2026-04-03
 
 ### Documentation
