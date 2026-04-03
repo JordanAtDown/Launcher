@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.11 — 2026-04-03
+
+### Corrections
+
+- Revert SW_HIDE to SW_SHOWMINIMIZED, SW_HIDE breaks apps like Afterburner
+
 ## v0.3.10 — 2026-04-03
 
 ### Corrections
