@@ -1,4 +1,5 @@
 use crate::config::MonitorConfig;
+use std::os::windows::process::CommandExt;
 use std::process::Command;
 
 /// Détermine si le launcher doit s'exécuter en mode jeu (`true`) ou bureau (`false`).
@@ -19,6 +20,7 @@ fn detect(name: &str) -> bool {
     let cmd = r#"Get-WmiObject -Namespace root\wmi -Class WmiMonitorID | ForEach-Object { ($_.UserFriendlyName | Where-Object {$_} | ForEach-Object {[char]$_}) -join '' }"#;
     let output = Command::new("powershell")
         .args(["-NoProfile", "-NonInteractive", "-Command", cmd])
+        .creation_flags(0x08000000)
         .output();
     match output {
         Ok(o) => String::from_utf8_lossy(&o.stdout)
