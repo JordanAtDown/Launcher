@@ -1,5 +1,11 @@
 # Changelog
 
+## v0.3.13 — 2026-04-05
+
+### Corrections
+
+- Hide PowerShell window during monitor detection (CREATE_NO_WINDOW)
+
 ## v0.3.12 — 2026-04-03
 
 ### Corrections
