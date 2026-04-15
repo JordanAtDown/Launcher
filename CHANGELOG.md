@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.0.0 — 2026-04-15
+
+### Nouveautés
+
+- Add notifications::restore to re-enable toast notifications in desktop mode
+
 ## v0.3.13 — 2026-04-05
 
 ### Corrections
