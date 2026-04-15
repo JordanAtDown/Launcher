@@ -22,6 +22,7 @@ pub fn execute_step(step: &str, config: &Config, is_game: bool) -> bool {
         "updates::pause"            => modules::updates::pause(&config.updates),
         "updates::restore"          => modules::updates::restore(&config.updates),
         "notifications::disable"    => modules::notifications::disable(&config.notifications),
+        "notifications::restore"    => modules::notifications::restore(&config.notifications),
         "killist::apply"            => modules::killist::apply(&config.killist),
         "disable_services::disable" => modules::disable_services::disable(&config.disable_services),
         "disable_services::restore" => modules::disable_services::restore(&config.disable_services),
